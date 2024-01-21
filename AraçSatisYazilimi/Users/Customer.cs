@@ -16,5 +16,9 @@ namespace AraçSatisYazilimi.NewFolder
         {
 
         }
+        public override string ToString()
+        {
+            return $"Customer ID: {Id} \nCustomer Name: {Name}\nCustomer Surname: {Surname}\nCustomer Username: {Username}\nCustomer Password: {Password}\nCustomer Email: {Email}\nCustomer Phone: {TelNo}";
+        }
     }
 }

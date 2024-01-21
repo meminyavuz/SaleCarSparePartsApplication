@@ -69,12 +69,12 @@ namespace AraçSatisYazilimi
                 {
                     if (IsString(value))
                     {
-                        _name = value;
+                        _surname = value;
                     }
                     else
                     {
                         Console.WriteLine("Your name must only consist of letters!");
-                        _name = null;
+                        _surname = null;
                     }
                 }
                 else

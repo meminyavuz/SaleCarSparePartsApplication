@@ -55,18 +55,16 @@ namespace AraçSatisYazilimi.Login
 
         public static void adminMainPage()
         {
+            Admin admin = new Admin();
+
             Console.Write("Enter the username: ");
             String username = Console.ReadLine();
 
             Console.Write("Enter the password: ");
             String password = Console.ReadLine();
-            Admin admin = new Admin();
 
-            if(AdminQuery.loginAdmin(username,password,admin))
-            {
-                
-                adminMenuPage(admin);
-            }            
+            if(AdminQuery.loginAdmin(username,password,admin)) adminMenuPage(admin);
+            else Console.WriteLine("Your username or password is wrong!");
         }
 
         public static void adminMenuPage(Admin admin)
@@ -78,12 +76,13 @@ namespace AraçSatisYazilimi.Login
                 Console.WriteLine("");
                 Console.WriteLine("------ADMIN MENU PAGE------");
                 Console.WriteLine("");
-                Console.WriteLine("Welcome " +admin.Name);
-
+                Console.WriteLine($"Welcome {admin.Name} {admin.Surname}");
+                Console.WriteLine("");
                 Console.WriteLine("1-Delete Dealer");
                 Console.WriteLine("2-Delete Customer");
                 Console.WriteLine("3-Delete Cars");
-                Console.WriteLine("4-Exit");
+                Console.WriteLine("4-Account Information");
+                Console.WriteLine("5-Exit");
                 Console.Write("Please enter your selection: ");
                 int ans = Convert.ToInt32(Console.ReadLine());
                 
@@ -107,6 +106,14 @@ namespace AraçSatisYazilimi.Login
                         break;
 
                     case 4:
+                        Console.WriteLine("");
+                        Console.WriteLine("---------------------------------");
+                        Console.WriteLine(admin.ToString());
+                        Console.WriteLine("---------------------------------");
+                        Console.WriteLine("");
+                        break;
+
+                    case 5:
                         flag = 0;
                         break;
 
@@ -137,19 +144,14 @@ namespace AraçSatisYazilimi.Login
                 {
                     case 1:
                         Console.Write("Enter the username: ");
-                        String username = Console.ReadLine();
+                        string username = Console.ReadLine();
 
                         Console.Write("Enter the password: ");
-                        String password = Console.ReadLine();
+                        string password = Console.ReadLine();
 
-                        if(DealerQuery.loginDealer(username, password, dealer))
-                        {
-                            dealerMenuPage();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Your username or password is wrong!");
-                        }
+                        if(DealerQuery.loginDealer(username, password, dealer)) dealerMenuPage(dealer);
+                        else Console.WriteLine("Your username or password is wrong!");
+
                         break;
 
                     case 2:          
@@ -211,30 +213,37 @@ namespace AraçSatisYazilimi.Login
 
         }
 
-        public static void dealerMenuPage()
+        public static void dealerMenuPage(Dealer dealer)
         {
             Car tempCar = new Car();
             int flag = 1;
             while (flag == 1)
             {
                 Console.WriteLine("------DEALER MENU PAGE------");
+                Console.WriteLine($"Welcome {dealer.Name} {dealer.Surname}");
+                Console.WriteLine("");
                 Console.WriteLine("1-Sales Transactions");
                 Console.WriteLine("2-Update Stocks");
                 Console.WriteLine("3-Add Car");
                 Console.WriteLine("4-Delete Car");
-                Console.WriteLine("5-Exit");
+                Console.WriteLine("5-Account Information");
+                Console.WriteLine("6-Delete Account");
+                Console.WriteLine("7-Exit");
+                Console.Write("Please enter your selection: ");
+
                 int ansMenu = Convert.ToInt32(Console.ReadLine());
                 switch (ansMenu)
                 {
                     case 1:
                         DealerQuery.displaySalesRequest();
-                        Console.Write("Please enter the ID of the sale you want to transact!: ");
+                        Console.Write("Please enter the basket ID of the sale you want to transact!: ");
                         int ansId = Convert.ToInt32(Console.ReadLine());
-                        Console.WriteLine("Do you want to sell the product?[Y/y: Yes - N/n: No]: ");
+                        Console.Write("Do you want to sell the product?[Y/y: Yes - N/n: No]: ");
                         char ansChoose = Convert.ToChar(Console.ReadLine());
-                        if (ansChoose == 'Y' || ansChoose == 'y') DealerQuery.moveToLog(ansId);
 
+                        if (ansChoose == 'Y' || ansChoose == 'y') DealerQuery.moveToLog(ansId);
                         else DealerQuery.deleteBasket(ansId);
+
                         break;
 
                     case 2:                        
@@ -260,6 +269,18 @@ namespace AraçSatisYazilimi.Login
                         break;
 
                     case 5:
+                        Console.WriteLine("");
+                        Console.WriteLine("---------------------------------");
+                        Console.WriteLine(dealer.ToString());
+                        Console.WriteLine("---------------------------------");
+                        Console.WriteLine("");
+                        break;
+
+                    case 6:
+                        DealerQuery.deleteDealerAccount(dealer.Id);
+                        break;
+
+                    case 7:
                         flag = 0;
                         break;
 
@@ -272,7 +293,6 @@ namespace AraçSatisYazilimi.Login
 
         public static void customerMainPage()
         {
-            Customer customer = new Customer();
             int flag = 1;
             while (flag == 1)
             {
@@ -285,6 +305,7 @@ namespace AraçSatisYazilimi.Login
                 switch (ans)
                 {
                     case 1:
+                        Customer customer = new Customer();
                         Console.Write("Enter the username: ");
                         String username = Console.ReadLine();
 
@@ -296,39 +317,41 @@ namespace AraçSatisYazilimi.Login
                         break;
 
                     case 2:
-                        Console.Write("Enter name: ");
-                        customer.Name = Convert.ToString(Console.ReadLine());
+                        Customer tempCustomer = new Customer();
 
-                        if (customer.Name != null)
+                        Console.Write("Enter name: ");
+                        tempCustomer.Name = Convert.ToString(Console.ReadLine());
+
+                        if (tempCustomer.Name != null)
                         {
                             Console.Write("Enter Surname: ");
-                            customer.Surname = Convert.ToString(Console.ReadLine());
+                            tempCustomer.Surname = Convert.ToString(Console.ReadLine());
 
-                            if (customer.Surname != null)
+                            if (tempCustomer.Surname != null)
                             {
                                 Console.Write("Enter Username: ");
-                                customer.Username = Convert.ToString(Console.ReadLine());
+                                tempCustomer.Username = Convert.ToString(Console.ReadLine());
 
-                                if (customer.Username != null)
+                                if (tempCustomer.Username != null)
                                 {
-                                    if (UserQuery.isUsernameNotUsed(customer.Username))
+                                    if (UserQuery.isUsernameNotUsed(tempCustomer.Username))
                                     {
                                         Console.Write("Enter Password: ");
-                                        customer.Password = Convert.ToString(Console.ReadLine());
+                                        tempCustomer.Password = Convert.ToString(Console.ReadLine());
 
-                                        if (customer.Password != null)
+                                        if (tempCustomer.Password != null)
                                         {
                                             Console.Write("Enter Email: ");
-                                            customer.Email = Convert.ToString(Console.ReadLine());
+                                            tempCustomer.Email = Convert.ToString(Console.ReadLine());
 
-                                            if (customer.Email != null)
+                                            if (tempCustomer.Email != null)
                                             {
                                                 Console.Write("Enter Phone: ");
-                                                customer.TelNo = Convert.ToString(Console.ReadLine());
+                                                tempCustomer.TelNo = Convert.ToString(Console.ReadLine());
 
-                                                if (customer.TelNo != null)
+                                                if (tempCustomer.TelNo != null)
                                                 {
-                                                    CustomerQuery.addCustomer(customer);
+                                                    CustomerQuery.addCustomer(tempCustomer);
                                                     break;
                                                 }
                                             }
@@ -351,15 +374,19 @@ namespace AraçSatisYazilimi.Login
             }
         }
 
-        public static void customerMenuPage(Customer tempCustomer)
+        public static void customerMenuPage(Customer customer)
         {
             int flag = 1;
             while(flag == 1)
             {
                 Console.WriteLine("------CUSTOMER MENU PAGE------");
+                Console.WriteLine($"Welcome {customer.Name} {customer.Surname}");
+                Console.WriteLine("");
                 Console.WriteLine("1-List Cars");
-                Console.WriteLine("2-Delete Account");
-                Console.WriteLine("3-Exit");
+                Console.WriteLine("2-Account Information");
+                Console.WriteLine("3-Delete Account");
+                Console.WriteLine("4-Exit");
+                Console.Write("Please enter your selection: ");
                 int ans = Convert.ToInt32(Console.ReadLine());
 
                 switch (ans)
@@ -374,45 +401,53 @@ namespace AraçSatisYazilimi.Login
                         Console.WriteLine("3-Exhaust");
                         Console.WriteLine("4-Brakes");
                         Console.WriteLine("5-Battery");
-                        Console.WriteLine("");
+                        Console.Write("Please enter the number of spare part you want to buy![1-5]: ");
                         int ansSpareParts = Convert.ToInt32(Console.ReadLine());
                         string sparePart;
                         if(ansSpareParts == 1)
                         {
                             sparePart = "engine";
-                            CustomerQuery.addToBasket(sparePart,tempCustomer,tempCar);
+                            CustomerQuery.addToBasket(sparePart, customer.Id,tempCar.Id);
                         }
                         else if(ansSpareParts == 2)
                         {
                             sparePart = "clutch";
-                            CustomerQuery.addToBasket(sparePart, tempCustomer, tempCar);
+                            CustomerQuery.addToBasket(sparePart, customer.Id, tempCar.Id);
                         }
                         else if(ansSpareParts == 3)
                         {
                             sparePart = "exhaust";
-                            CustomerQuery.addToBasket(sparePart, tempCustomer, tempCar);
+                            CustomerQuery.addToBasket(sparePart, customer.Id, tempCar.Id);
                         }
                         else if(ansSpareParts == 4)
                         {
                             sparePart = "brakes";
-                            CustomerQuery.addToBasket(sparePart, tempCustomer, tempCar);
+                            CustomerQuery.addToBasket(sparePart, customer.Id, tempCar.Id);
                         }
                         else if (ansSpareParts == 5)
                         {
                             sparePart = "battery";
-                            CustomerQuery.addToBasket(sparePart, tempCustomer, tempCar);
+                            CustomerQuery.addToBasket(sparePart, customer.Id, tempCar.Id);
                         }
                         else Console.WriteLine("Wrong Entry!");
                         break;
 
                     case 2:
-                        if (CustomerQuery.deleteAccount(tempCustomer.Id))
+                        Console.WriteLine("");
+                        Console.WriteLine("---------------------------------");
+                        Console.WriteLine(customer.ToString());
+                        Console.WriteLine("---------------------------------");
+                        Console.WriteLine("");
+                        break;
+
+                    case 3:
+                        if (CustomerQuery.deleteCustomerAccount(customer.Id))
                         {                            
                             customerMainPage();
                         }
                         break;
 
-                    case 3:
+                    case 4:
                         flag = 0;
                         break;
 
@@ -422,11 +457,5 @@ namespace AraçSatisYazilimi.Login
                 }
             }
         }
-
-        public static bool signUpForms(string name, string surname, string username, string password, string email, string phone)
-        {
-
-            return true;
-        } 
     }
 }

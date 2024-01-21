@@ -1,4 +1,5 @@
 ﻿using AraçSatisYazilimi.NewFolder;
+using AraçSatisYazilimi.Vehicle;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -92,7 +93,8 @@ namespace AraçSatisYazilimi.Query
             try
             {
                 connection.Open();
-                string selectQuery = "SELECT * FROM basket";
+                string selectQuery = "SELECT basket.basketId, basket.carId, car.brand_name, car.car_model, car.car_packet,basket.sparepart, basket.customerId, users.name, users.surname, users.email, users.phone FROM basket INNER JOIN car ON basket.carId = car.carID INNER JOIN users ON basket.customerId = users.ID";
+
                 SqlCommand selectCmd = new SqlCommand(selectQuery, connection);
                 SqlDataReader basketReader = selectCmd.ExecuteReader();
 
@@ -101,11 +103,13 @@ namespace AraçSatisYazilimi.Query
                     Console.WriteLine("");
                     Console.WriteLine("-------------------------------------------");
                     Console.WriteLine("Basket ID: "+(int)basketReader.GetValue(0));
+                    Console.WriteLine("");
                     Console.WriteLine("Car ID:"+(int)basketReader.GetValue(1));
                     Console.WriteLine("Car Brand: "+basketReader.GetValue(2).ToString());
                     Console.WriteLine("Car Model: "+basketReader.GetValue(3).ToString());
                     Console.WriteLine("Car Packet: "+basketReader.GetValue(4).ToString());
                     Console.WriteLine("Spare Part: "+basketReader.GetValue(5).ToString());
+                    Console.WriteLine("-----Customer Information-----");
                     Console.WriteLine("Customer ID: "+basketReader.GetValue(6));
                     Console.WriteLine("Customer Name: "+basketReader.GetValue(7).ToString());
                     Console.WriteLine("Customer Surname: "+basketReader.GetValue(8).ToString());
@@ -131,7 +135,7 @@ namespace AraçSatisYazilimi.Query
             {
                 connection.Open();
 
-                string insertQuery = "INSERT INTO log (basketID, carID, car_brand, car_model, car_packet, spare_part, customerID, customer_name, customer_surname, customer_email, customer_phone) SELECT basketID, carID, car_brand, car_model, car_packet, spare_part, customerID, customer_name, customer_surname, customer_email, customer_phone FROM basket WHERE basketID = @basketId;";
+                string insertQuery = "INSERT INTO log (basketID, carID, sparepart, customerID) SELECT basketID, carID, sparepart, customerID FROM basket WHERE basketID = @basketId;";
 
                 SqlCommand insertCmd = new SqlCommand(insertQuery, connection);
                 insertCmd.Parameters.AddWithValue("@basketID", basketId);
@@ -139,7 +143,7 @@ namespace AraçSatisYazilimi.Query
                 insertCmd.ExecuteNonQuery();
                 Console.WriteLine("Sales transaction successful!");
 
-                string selectQuery = "SELECT carID,spare_part FROM basket WHERE basketID = @basketId";
+                string selectQuery = "SELECT carID,sparepart FROM basket WHERE basketID = @basketId";
                 SqlCommand selectCmd = new SqlCommand(selectQuery, connection);
                 selectCmd.Parameters.AddWithValue("@basketID", basketId);
                 SqlDataReader readSparePart = selectCmd.ExecuteReader();
@@ -152,8 +156,6 @@ namespace AraçSatisYazilimi.Query
                     deleteBasket(basketId);
                 }
                 readSparePart.Close();
-
-                
             }
             catch (Exception e)
             {
@@ -172,9 +174,11 @@ namespace AraçSatisYazilimi.Query
                 SqlCommand deleteCmd = new SqlCommand(deleteQuery, connection);
 
                 deleteCmd.Parameters.AddWithValue("@BasketId", basketId);
-                deleteCmd.ExecuteNonQuery();
+                int rowsAffected = deleteCmd.ExecuteNonQuery();
 
-                Console.WriteLine("Deletion Successful!");
+                if(rowsAffected > 0) Console.WriteLine("Deletion Successful!");
+                else Console.WriteLine("Deletion failed! Basket with the specified ID not found.");
+
             }
             catch(Exception e)
             {
@@ -199,5 +203,46 @@ namespace AraçSatisYazilimi.Query
                 Console.WriteLine(e.Message);
             }
         }
+
+        public static bool deleteDealerAccount(int dealerId)
+        {
+            Console.Write("Are you sure you want to delete your account? Your membership will be permanently deleted[Y/y: Yes - N/n: No]: ");
+            char ans = Convert.ToChar(Console.ReadLine());
+
+            if (ans == 'Y' || ans == 'y')
+            {
+                SqlConnection connection = new SqlConnection("Data Source=DESKTOP-2FKN5LJ\\MYSQLSERVER;Initial Catalog=carsale;Integrated Security=True");
+
+
+                try
+                {
+                    connection.Open();
+
+                    string deleteCustomerQuery = $"DELETE FROM dealer WHERE dealerID = {dealerId}";
+                    SqlCommand deleteCustomerCmd = new SqlCommand(deleteCustomerQuery, connection);
+                    int rowsAffectedCustomer = deleteCustomerCmd.ExecuteNonQuery();
+
+                    if (rowsAffectedCustomer > 0)
+                    {
+                        string deleteUserQuery = $"DELETE FROM users WHERE ID = {dealerId}";
+                        SqlCommand deleteUserCmd = new SqlCommand(deleteUserQuery, connection);
+                        int rowsAffectedUser = deleteUserCmd.ExecuteNonQuery();
+                        if (rowsAffectedUser > 0)
+                        {
+                            Console.WriteLine("Your membership has been permanently deleted.");
+                            return true;
+                        }
+                    }
+                    connection.Close();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error!: " + e.Message);
+                }
+            }
+            return false;
+        }
+
+
     }
 }

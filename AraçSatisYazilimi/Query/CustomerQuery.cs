@@ -86,7 +86,7 @@ namespace AraçSatisYazilimi.Query
             return false;
         }
 
-        public static bool deleteAccount(int customerId)
+        public static bool deleteCustomerAccount(int customerId)
         {
             Console.Write("Are you sure you want to delete your account? Your membership will be permanently deleted[Y/y: Yes - N/n: No]: ");
             char ans = Convert.ToChar(Console.ReadLine());
@@ -99,22 +99,31 @@ namespace AraçSatisYazilimi.Query
                 try
                 {
                     connection.Open();
-                    string deleteCustomerQuery = $"DELETE FROM customer WHERE customerID = {customerId}";
-                    SqlCommand deleteCustomerCmd = new SqlCommand(deleteCustomerQuery,connection);
-                    int rowsAffectedCustomer = deleteCustomerCmd.ExecuteNonQuery();
 
-                    if(rowsAffectedCustomer > 0)
+                    if (!isCustomerInBasket(customerId))
                     {
-                        string deleteUserQuery = $"DELETE FROM users WHERE ID = {customerId}";
-                        SqlCommand deleteUserCmd = new SqlCommand(deleteUserQuery, connection);
-                        int rowsAffectedUser = deleteUserCmd.ExecuteNonQuery();
-                        if( rowsAffectedUser > 0)
+                        string deleteCustomerQuery = $"DELETE FROM customer WHERE customerID = {customerId}";
+                        SqlCommand deleteCustomerCmd = new SqlCommand(deleteCustomerQuery, connection);
+                        int rowsAffectedCustomer = deleteCustomerCmd.ExecuteNonQuery();
+
+                        if (rowsAffectedCustomer > 0)
                         {
-                            Console.WriteLine("Your membership has been permanently deleted.");
-                            connection.Close();
-                            return true;
-                        }                       
+                            string deleteUserQuery = $"DELETE FROM users WHERE ID = {customerId}";
+                            SqlCommand deleteUserCmd = new SqlCommand(deleteUserQuery, connection);
+                            int rowsAffectedUser = deleteUserCmd.ExecuteNonQuery();
+                            if (rowsAffectedUser > 0)
+                            {
+                                Console.WriteLine("Your membership has been permanently deleted.");
+                                return true;
+                            }
+                        }
+                        
                     }
+                    else
+                    {
+                        Console.WriteLine("Your account could not be deleted because you have placed an order!");
+                    }
+                   connection.Close();
                 }
                 catch(Exception e)
                 {
@@ -124,7 +133,7 @@ namespace AraçSatisYazilimi.Query
             return false;
         }
 
-        public static void addToBasket(string spare_part,Customer tempCustomer,Car tempCar)
+        public static void addToBasket(string sparepart,int customerId,int carId)
         {
             SqlConnection connection = new SqlConnection("Data Source=DESKTOP-2FKN5LJ\\MYSQLSERVER;Initial Catalog=carsale;Integrated Security=True");
 
@@ -132,53 +141,61 @@ namespace AraçSatisYazilimi.Query
             {
                 connection.Open();
 
-                string selectQuery = $"SELECT brand_name,car_model,car_packet FROM car WHERE carID = {tempCar.Id}";
-                SqlCommand selectCmd = new SqlCommand(selectQuery,connection);
-                SqlDataReader readerCar = selectCmd.ExecuteReader();
-                while (readerCar.Read())
+                string checkCarQuery = "SELECT COUNT(*) FROM car WHERE carID = @carId";
+                SqlCommand checkCarCmd = new SqlCommand(checkCarQuery, connection);
+                checkCarCmd.Parameters.AddWithValue("@carId", carId);
+
+                int carCount = (int)checkCarCmd.ExecuteScalar();
+
+                if (carCount > 0)
                 {
-                    tempCar.BrandName = readerCar.GetValue(0).ToString();
-                    tempCar.Model = readerCar.GetValue(1).ToString();
-                    tempCar.Packet = readerCar.GetValue(2).ToString();
+                    string insertQuery = "INSERT INTO basket(carId, sparepart, customerId) VALUES (@carId, @sparepart, @customerId)";
+                    SqlCommand insertCmd = new SqlCommand(insertQuery, connection);
+
+                    insertCmd.Parameters.AddWithValue("@sparepart", sparepart);
+                    insertCmd.Parameters.AddWithValue("@customerId", customerId);
+                    insertCmd.Parameters.AddWithValue("@carId", carId);
+
+                    int rowsAffected = insertCmd.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                        Console.WriteLine("Added To The Basket!");
                 }
-                readerCar.Close();
-
-                string selectCustomerQuery = $"SELECT name,surname,email,phone FROM users WHERE ID = {tempCustomer.Id}";
-                SqlCommand selectCustomerCmd = new SqlCommand(selectCustomerQuery, connection);
-                SqlDataReader readerCustomer = selectCustomerCmd.ExecuteReader();
-
-                while (readerCustomer.Read())
+                else
                 {
-                    tempCustomer.Name = readerCustomer.GetValue(0).ToString();
-                    tempCustomer.Surname = readerCustomer.GetValue(1).ToString();
-                    tempCustomer.Email = readerCustomer.GetValue(2).ToString();
-                    tempCustomer.TelNo = readerCustomer.GetValue(3).ToString();
+                    Console.WriteLine("Error: CarId not found. Item not added to the basket.");
                 }
-                readerCustomer.Close();
-
-                string insertQuery = "INSERT INTO basket (carID,car_brand,car_model,car_packet,spare_part,customerID,customer_name,customer_surname,customer_email,customer_phone) values (@carID,@car_brand,@car_model,@car_packet,@spare_part,@customerID,@customer_name,@customer_surname,@customer_email,@customer_phone) ";
-
-                SqlCommand insertCmd = new SqlCommand(insertQuery,connection);
-
-                insertCmd.Parameters.AddWithValue("@carID",tempCar.Id);
-                insertCmd.Parameters.AddWithValue("@car_brand",tempCar.BrandName);
-                insertCmd.Parameters.AddWithValue("@car_model",tempCar.Model);
-                insertCmd.Parameters.AddWithValue("@car_packet",tempCar.Packet);
-                insertCmd.Parameters.AddWithValue("@spare_part",spare_part);
-                insertCmd.Parameters.AddWithValue("@customerID",tempCustomer.Id);
-                insertCmd.Parameters.AddWithValue("@customer_name",tempCustomer.Name);
-                insertCmd.Parameters.AddWithValue("@customer_surname",tempCustomer.Surname);
-                insertCmd.Parameters.AddWithValue("@customer_email",tempCustomer.Email);
-                insertCmd.Parameters.AddWithValue("@customer_phone",tempCustomer.TelNo);
-
-                insertCmd.ExecuteNonQuery();
-                Console.WriteLine("Added To The Basket!");
-
             }
             catch(Exception e)
             {
                 Console.WriteLine("Error!: "+e.Message);
             }
+            connection.Close();
+        }
+
+        public static bool isCustomerInBasket(int customerId)
+        {
+            SqlConnection connection = new SqlConnection("Data Source=DESKTOP-2FKN5LJ\\MYSQLSERVER;Initial Catalog=carsale;Integrated Security=True");
+            try
+            {
+                connection.Open();
+
+                string checkCustomerQuery = "SELECT COUNT(*) FROM basket WHERE customerId = @customerId";
+                SqlCommand checkCustomerCmd = new SqlCommand(checkCustomerQuery, connection);
+
+                checkCustomerCmd.Parameters.AddWithValue("@customerId", customerId);
+                
+                int customerCount = (int)checkCustomerCmd.ExecuteScalar();
+                if (customerCount > 0)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return false;
         }
 
     }

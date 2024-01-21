@@ -71,7 +71,7 @@ namespace AraçSatisYazilimi.Query
                 }
                 else
                 {
-                    string deleteQuery = "DELETE FROM car WHERE carID = (@CarId)";
+                    string deleteQuery = "DELETE FROM car WHERE carID = @CarId";
                     SqlCommand deleteCmd = new SqlCommand(deleteQuery, connection);
 
                     deleteCmd.Parameters.AddWithValue("@CarId", carId);
@@ -101,27 +101,7 @@ namespace AraçSatisYazilimi.Query
             {
                 connection.Open();
 
-                string selectQuery = "SELECT * FROM car";
-                SqlCommand selectCmd = new SqlCommand(selectQuery, connection);
-
-                SqlDataReader dataSelectReader = selectCmd.ExecuteReader();
-                while (dataSelectReader.Read())
-                {
-                    Console.WriteLine("");
-                    Console.WriteLine("Car's Id: " + dataSelectReader.GetInt32(0));
-                    Console.WriteLine("Car's Brand: " + dataSelectReader.GetString(1));
-                    Console.WriteLine("Car's Model: " + dataSelectReader.GetString(2));
-                    Console.WriteLine("Car's Packet: " + dataSelectReader.GetString(3));
-                    Console.WriteLine("Engine Stock: " + dataSelectReader.GetInt32(4));
-                    Console.WriteLine("Clutch Stock: " + dataSelectReader.GetInt32(5));
-                    Console.WriteLine("Exhaust Stock: " + dataSelectReader.GetInt32(6));
-                    Console.WriteLine("Brakes Stock: " + dataSelectReader.GetInt32(7));
-                    Console.WriteLine("Battery Stock: " + dataSelectReader.GetInt32(8));
-                    Console.WriteLine("");
-                    Console.WriteLine("----------------------------------------");
-
-                }
-                dataSelectReader.Close();
+                listCar();
 
                 Console.Write("Please enter the ID of the car whose stock you want to update!: ");
                 int carChoose = Convert.ToInt32(Console.ReadLine());
@@ -154,20 +134,25 @@ namespace AraçSatisYazilimi.Query
             {
                 connection.Open();
 
-                string selectQuery = "SELECT * FROM car";
+                string selectQuery = "SELECT * FROM car ORDER BY brand_name ASC";
                 SqlCommand selectCmd = new SqlCommand(selectQuery, connection);
 
                 SqlDataReader dataSelectReader = selectCmd.ExecuteReader();
                 while (dataSelectReader.Read())
                 {
                     Console.WriteLine("");
-                    Console.WriteLine("Car's Id: " + dataSelectReader.GetInt32(0));
-                    Console.WriteLine("Car's Brand: " + dataSelectReader.GetString(1));
-                    Console.WriteLine("Car's Model: " + dataSelectReader.GetString(2));
-                    Console.WriteLine("Car's Packet: " + dataSelectReader.GetString(3));
-                    Console.WriteLine("");
                     Console.WriteLine("----------------------------------------");
-
+                    Console.WriteLine("Car's Id: " +dataSelectReader.GetInt32(0));
+                    Console.WriteLine("Car's Brand: " +dataSelectReader.GetString(1));
+                    Console.WriteLine("Car's Model: " +dataSelectReader.GetString(2));
+                    Console.WriteLine("Car's Packet: " +dataSelectReader.GetString(3));
+                    Console.WriteLine("Engine Stock: " +dataSelectReader.GetInt32(4));
+                    Console.WriteLine("Clutch Stock: " +dataSelectReader.GetInt32(5));
+                    Console.WriteLine("Exhaust Stock: " +dataSelectReader.GetInt32(6));
+                    Console.WriteLine("Brakes Stock: " +dataSelectReader.GetInt32(7));
+                    Console.WriteLine("Battery Stock: " +dataSelectReader.GetInt32(8));
+                    Console.WriteLine("----------------------------------------");
+                    Console.WriteLine("");
                 }
                 dataSelectReader.Close();
             }

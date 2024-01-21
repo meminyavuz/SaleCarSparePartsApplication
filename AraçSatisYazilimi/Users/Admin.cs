@@ -19,6 +19,10 @@ namespace AraçSatisYazilimi.NewFolder
         {
             
         }
+        public override string ToString()
+        {
+            return $"Admin ID: {Id} \nAdmin Name: {Name}\nAdmin Surname: {Surname}\nAdmin Username: {Username}\nAdmin Password: {Password}\nAdmin Email: {Email}\nAdmin Phone: {TelNo}";
+        }
 
     }
 }

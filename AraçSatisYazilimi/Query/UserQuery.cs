@@ -84,6 +84,7 @@ namespace AraçSatisYazilimi.Query
             {
                 connection.Open();
 
+                //kullanıcıdan alınan username users tablosunda varsa sayacı artırır.
                 string selectQuery = "SELECT COUNT(*) FROM users WHERE username = @username";
 
                 SqlCommand selectCmd = new SqlCommand(selectQuery, connection);
@@ -93,7 +94,8 @@ namespace AraçSatisYazilimi.Query
 
                 if (count > 0)
                 {
-                    Console.WriteLine("Username is used!");
+                    Console.WriteLine("Username is already taken!");
+                    
                     return false;
                 }
                 else return true;
@@ -102,6 +104,7 @@ namespace AraçSatisYazilimi.Query
             {
                 Console.WriteLine("Error!: " + e.Message);
             }
+            connection.Close();
             return false;
         }
     }
