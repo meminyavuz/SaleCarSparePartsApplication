@@ -73,7 +73,7 @@ namespace AraçSatisYazilimi
                     }
                     else
                     {
-                        Console.WriteLine("Your name must only consist of letters!");
+                        Console.WriteLine("Your surname must only consist of letters!");
                         _surname = null;
                     }
                 }
@@ -98,14 +98,14 @@ namespace AraçSatisYazilimi
                         if (char.IsLetterOrDigit(c)) _username = value;
                         else
                         { 
-                            Console.WriteLine("Invalid Username");
+                            Console.WriteLine("Username must consist of numbers or characters!");
                             _username = null;
                         }
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Invalid Username!");
+                    Console.WriteLine("Username must be between 5 and 20 characters!");
                     _username = null;
                 }
             }
@@ -125,13 +125,15 @@ namespace AraçSatisYazilimi
                     }
                     else
                     {
-                        Console.WriteLine("Invalid Password!");
+                        Console.WriteLine("Wrong Password!");
+                        Console.WriteLine("Your password must contain:");
+                        Console.WriteLine("*Contains at least one digit.\n*Contains at least one uppercase alphabet.\n*Contains at least one lowercase alphabet.\n*Contains at least one special character consisting of !@#$%&*-+.\n*Does not contain any spaces.");
                         _password = null;
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Invalid Password!");
+                    Console.WriteLine("Password must be between 8 and 20 characters!");
                     _password = null;
                 }
             }
@@ -150,7 +152,7 @@ namespace AraçSatisYazilimi
                 }
                 else
                 {
-                    Console.WriteLine("Invalid E-Mail!");
+                    Console.WriteLine("Invalid E-Mail![Email cannot be initialized with special characters and must contain @ symbol.]");
                     _email = null;
                 }
             }
@@ -169,14 +171,14 @@ namespace AraçSatisYazilimi
                         if (char.IsDigit(c)) _phone = value;
                         else
                         {
-                            Console.WriteLine("Invalid Phone No!");
+                            Console.WriteLine("Invalid Phone No![Phone Number must consist of numbers only]");
                             _phone = null;
                         }
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Invalid Phone No!");
+                    Console.WriteLine("Invalid Phone No![Phone Number must be in the form xxx-xxx-xxxx.]");
                     _phone = null;
                 }
             }
@@ -196,6 +198,7 @@ namespace AraçSatisYazilimi
             Email = email;
             TelNo = telno;
         }
+
         static bool IsString(string username)
         {
             foreach (char c in username)

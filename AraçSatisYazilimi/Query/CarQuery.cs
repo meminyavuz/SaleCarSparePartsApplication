@@ -10,6 +10,7 @@ namespace AraçSatisYazilimi.Query
 {
     public class CarQuery
     {
+        //araba ekleme fonksiyonu
         public static void addCar(Car tempCar)
         {
             SqlConnection connection = new SqlConnection("Data Source=DESKTOP-2FKN5LJ\\MYSQLSERVER;Initial Catalog=carsale;Integrated Security=True");
@@ -35,18 +36,20 @@ namespace AraçSatisYazilimi.Query
             connection.Close();
         }
 
+        //arabanın sepette bulunup bulunmadığını kontrol eden fonksiyon
         public static bool IsUsedInBasket(int carId)
         {
             SqlConnection connection = new SqlConnection("Data Source=DESKTOP-2FKN5LJ\\MYSQLSERVER;Initial Catalog=carsale;Integrated Security=True");
             try
             {
                 connection.Open();
-                string checkQuery = "SELECT COUNT(*) FROM basket WHERE carID = @CarId";
+                string checkQuery = "SELECT COUNT(*) FROM basket WHERE carID = @CarId"; //parametreyle gelen id tabloda bulunuyorsa say
                 SqlCommand checkCmd = new SqlCommand(checkQuery, connection);
 
                 checkCmd.Parameters.AddWithValue("@CarId", carId);
 
                 int count = (int)checkCmd.ExecuteScalar();
+
                 connection.Close();
                 return count > 0;
             }
@@ -57,6 +60,7 @@ namespace AraçSatisYazilimi.Query
             }  
         }
 
+        //araba silme fonksiyonu
         public static void deleteCar(int carId)
         {
             
@@ -71,7 +75,7 @@ namespace AraçSatisYazilimi.Query
                 }
                 else
                 {
-                    string deleteQuery = "DELETE FROM car WHERE carID = @CarId";
+                    string deleteQuery = "DELETE FROM car WHERE carID = @CarId"; //fonksiyonda parametre olarak gelen arabayı car tablosundan sil
                     SqlCommand deleteCmd = new SqlCommand(deleteQuery, connection);
 
                     deleteCmd.Parameters.AddWithValue("@CarId", carId);
@@ -93,6 +97,7 @@ namespace AraçSatisYazilimi.Query
             }
         }
 
+        //yedek parça stoklarını görüntüleme ve güncelleme işlemi yapan fonksiyon
         public static void displayAndUpdateStocks()
         {
             
@@ -125,6 +130,7 @@ namespace AraçSatisYazilimi.Query
             connection.Close();
         }
 
+        //araçları listeleme fonksiyonu
         public static void listCar()
         {
             Car tempCar = new Car();
@@ -134,7 +140,7 @@ namespace AraçSatisYazilimi.Query
             {
                 connection.Open();
 
-                string selectQuery = "SELECT * FROM car ORDER BY brand_name ASC";
+                string selectQuery = "SELECT * FROM car ORDER BY brand_name ASC"; //car tablosunaki tüm verileri çek brand_name kolonuna göre sırala [A-Z]
                 SqlCommand selectCmd = new SqlCommand(selectQuery, connection);
 
                 SqlDataReader dataSelectReader = selectCmd.ExecuteReader();
@@ -146,6 +152,7 @@ namespace AraçSatisYazilimi.Query
                     Console.WriteLine("Car's Brand: " +dataSelectReader.GetString(1));
                     Console.WriteLine("Car's Model: " +dataSelectReader.GetString(2));
                     Console.WriteLine("Car's Packet: " +dataSelectReader.GetString(3));
+                    Console.WriteLine("------Stock Information------");
                     Console.WriteLine("Engine Stock: " +dataSelectReader.GetInt32(4));
                     Console.WriteLine("Clutch Stock: " +dataSelectReader.GetInt32(5));
                     Console.WriteLine("Exhaust Stock: " +dataSelectReader.GetInt32(6));

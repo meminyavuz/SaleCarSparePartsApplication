@@ -16,7 +16,6 @@ namespace AraçSatisYazilimi.Query
         {
             User tempUser = new User();
 
-
             tempUser.Name = tempCustomer.Name;
             tempUser.Surname = tempCustomer.Surname;
             tempUser.Email = tempCustomer.Email;
@@ -48,7 +47,7 @@ namespace AraçSatisYazilimi.Query
             connection.Close();
         }
 
-
+        
         public static bool loginCustomer(string username, string password, Customer customer)
         {
             User tempUser = new User();
@@ -86,6 +85,7 @@ namespace AraçSatisYazilimi.Query
             return false;
         }
 
+        //Satıcı hesap silme fonksiyonu
         public static bool deleteCustomerAccount(int customerId)
         {
             Console.Write("Are you sure you want to delete your account? Your membership will be permanently deleted[Y/y: Yes - N/n: No]: ");
@@ -100,7 +100,7 @@ namespace AraçSatisYazilimi.Query
                 {
                     connection.Open();
 
-                    if (!isCustomerInBasket(customerId))
+                    if (!isCustomerInBasket(customerId)) //kullanıcının siparişi var mı kontrolü
                     {
                         string deleteCustomerQuery = $"DELETE FROM customer WHERE customerID = {customerId}";
                         SqlCommand deleteCustomerCmd = new SqlCommand(deleteCustomerQuery, connection);
@@ -117,7 +117,6 @@ namespace AraçSatisYazilimi.Query
                                 return true;
                             }
                         }
-                        
                     }
                     else
                     {
@@ -127,12 +126,13 @@ namespace AraçSatisYazilimi.Query
                 }
                 catch(Exception e)
                 {
-                    Console.WriteLine("Error!: "+e.Message);                   
-                }            
+                    Console.WriteLine("Error!: " + e.Message);
+                }
             }
             return false;
         }
 
+        //sepete yedek parça ekleme fonksiyonu
         public static void addToBasket(string sparepart,int customerId,int carId)
         {
             SqlConnection connection = new SqlConnection("Data Source=DESKTOP-2FKN5LJ\\MYSQLSERVER;Initial Catalog=carsale;Integrated Security=True");
@@ -141,7 +141,7 @@ namespace AraçSatisYazilimi.Query
             {
                 connection.Open();
 
-                string checkCarQuery = "SELECT COUNT(*) FROM car WHERE carID = @carId";
+                string checkCarQuery = "SELECT COUNT(*) FROM car WHERE carID = @carId"; //parametreyle gelen araba Id si tabloda var mı sorgusu
                 SqlCommand checkCarCmd = new SqlCommand(checkCarQuery, connection);
                 checkCarCmd.Parameters.AddWithValue("@carId", carId);
 
@@ -172,6 +172,7 @@ namespace AraçSatisYazilimi.Query
             connection.Close();
         }
 
+        //customer Id sinin basket tablosunda olup olmadığını kontrol eden fonksiyon
         public static bool isCustomerInBasket(int customerId)
         {
             SqlConnection connection = new SqlConnection("Data Source=DESKTOP-2FKN5LJ\\MYSQLSERVER;Initial Catalog=carsale;Integrated Security=True");

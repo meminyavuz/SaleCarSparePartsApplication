@@ -77,6 +77,7 @@ namespace AraçSatisYazilimi.Query
             return false;
         }
 
+        //kullanıcı adının kullanıp kullanılmadığını anlamak için fonksiyon
         public static bool isUsernameNotUsed(string username)
         {
             SqlConnection connection = new SqlConnection("Data Source=DESKTOP-2FKN5LJ\\MYSQLSERVER;Initial Catalog=carsale;Integrated Security=True");
@@ -84,7 +85,7 @@ namespace AraçSatisYazilimi.Query
             {
                 connection.Open();
 
-                //kullanıcıdan alınan username users tablosunda varsa sayacı artırır.
+                //fonksiyonda parametre olarak gelen username verisini users tablosunda karşılaştır aynı değer bulunursa sayaç arttır.
                 string selectQuery = "SELECT COUNT(*) FROM users WHERE username = @username";
 
                 SqlCommand selectCmd = new SqlCommand(selectQuery, connection);
@@ -94,8 +95,6 @@ namespace AraçSatisYazilimi.Query
 
                 if (count > 0)
                 {
-                    Console.WriteLine("Username is already taken!");
-                    
                     return false;
                 }
                 else return true;

@@ -25,6 +25,7 @@ namespace AraçSatisYazilimi.Login
                 Console.WriteLine("2-Dealer Page");
                 Console.WriteLine("3-Customer Page");
                 Console.WriteLine("4-Exit");
+                Console.Write("Please enter your selection: ");
 
                 int ans = Convert.ToInt32(Console.ReadLine());
 

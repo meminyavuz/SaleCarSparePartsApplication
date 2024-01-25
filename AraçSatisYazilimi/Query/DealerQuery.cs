@@ -48,8 +48,6 @@ namespace AraçSatisYazilimi.Query
             connection.Close();
         }
 
-
-
         public static bool loginDealer(string username, string password, Dealer dealer)
         {
             User tempUser = new User();
@@ -87,6 +85,7 @@ namespace AraçSatisYazilimi.Query
             return false;
         }
 
+        //satış isteklerinin gösterildiği fonksiyon
         public static void displaySalesRequest()
         {
             SqlConnection connection = new SqlConnection("Data Source=DESKTOP-2FKN5LJ\\MYSQLSERVER;Initial Catalog=carsale;Integrated Security=True");
@@ -127,6 +126,7 @@ namespace AraçSatisYazilimi.Query
             }
         }
 
+        //onaylanan satışın log tablosuna eklenmesini sağlayan fonksiyon
         public static void moveToLog(int basketId)
         {
             SqlConnection connection = new SqlConnection("Data Source=DESKTOP-2FKN5LJ\\MYSQLSERVER;Initial Catalog=carsale;Integrated Security=True");
@@ -163,6 +163,7 @@ namespace AraçSatisYazilimi.Query
             }
         }
 
+        //satış işlemi onaylandığında sepetten silme fonksiyonu
         public static void deleteBasket(int basketId)
         {
             SqlConnection connection = new SqlConnection("Data Source=DESKTOP-2FKN5LJ\\MYSQLSERVER;Initial Catalog=carsale;Integrated Security=True");
@@ -186,6 +187,7 @@ namespace AraçSatisYazilimi.Query
             }
         }
 
+        //satış işlemi onaylandığında ilgili arabanın yedek parçasının stoğunu 1 azaltan fonksiyon
         public static void updateCarStock(string sparePart, int carId)
         {
             SqlConnection connection = new SqlConnection("Data Source=DESKTOP-2FKN5LJ\\MYSQLSERVER;Initial Catalog=carsale;Integrated Security=True");
@@ -204,8 +206,10 @@ namespace AraçSatisYazilimi.Query
             }
         }
 
+        //satıcı hesap silme fonksiyonu
         public static bool deleteDealerAccount(int dealerId)
         {
+
             Console.Write("Are you sure you want to delete your account? Your membership will be permanently deleted[Y/y: Yes - N/n: No]: ");
             char ans = Convert.ToChar(Console.ReadLine());
 
@@ -218,14 +222,20 @@ namespace AraçSatisYazilimi.Query
                 {
                     connection.Open();
 
+                    //fonksiyondan parametre olarak gelen veriyi dealer tablosunda ara bulursan sil
                     string deleteCustomerQuery = $"DELETE FROM dealer WHERE dealerID = {dealerId}";
                     SqlCommand deleteCustomerCmd = new SqlCommand(deleteCustomerQuery, connection);
+
+                    //eğer herhangi bir satır bu işlemden etkilenirse değişkeni arttırır
                     int rowsAffectedCustomer = deleteCustomerCmd.ExecuteNonQuery();
 
                     if (rowsAffectedCustomer > 0)
                     {
+                        //fonksiyondan parametre olarak gelen veriyi users tablosunda ara bulursan sil
                         string deleteUserQuery = $"DELETE FROM users WHERE ID = {dealerId}";
                         SqlCommand deleteUserCmd = new SqlCommand(deleteUserQuery, connection);
+
+                        //eğer herhangi bir satır bu işlemden etkilenirse değişkeni arttırır
                         int rowsAffectedUser = deleteUserCmd.ExecuteNonQuery();
                         if (rowsAffectedUser > 0)
                         {
